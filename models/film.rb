@@ -39,6 +39,13 @@ class Film
     return customers_hash.map{|customer| Customer.new(customer)}
   end
 
+  def tickets_sold()
+    sql = "SELECT * FROM tickets WHERE film_id = $1"
+    values = [@id]
+    tickets = SqlRunner.run(sql, values)
+    return tickets.ntuples()
+  end
+
   def self.all()
     sql = "SELECT * FROM films"
     films_array = SqlRunner.run(sql)

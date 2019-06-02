@@ -1,5 +1,6 @@
 require_relative("../db/sql_runner")
 require_relative("film")
+require_relative("ticket")
 
 class Customer
   attr_reader :id
@@ -37,6 +38,27 @@ class Customer
     values = [@id]
     films_array = SqlRunner.run(sql, values)
     return films_array.map{|film| Film.new(film)}
+  end
+
+  def buy_ticket(film)
+    if @funds >= film.price
+      @funds -= film.price
+      update()
+      ticket_options = {
+        "film_id" => film.id,
+        "customer_id" => @id
+      }
+      ticket = Ticket.new(ticket_options)
+      ticket.save
+    end
+
+  end
+
+  def number_of_tickets()
+    sql = "SELECT * FROM tickets WHERE customer_id = $1"
+    values = [@id]
+    tickets = SqlRunner.run(sql, values)
+    return tickets.ntuples()
   end
 
   def self.all()
